@@ -5,25 +5,25 @@
  *      Author: rkouere
  */
 
-#include "master.h"
 #include "systemc.h"
-  SC_MODULE (master) {
+
+#include "ocp.h"
+  SC_MODULE (ocp) {
 	  /* Basic OCP signals */
 	  sc_in<bool> Clk;
-	  sc_in<sc_uint<2>> MCmd;
-	  sc_in<sc_uint<8>> MAddr;
-	  sc_in<sc_uint<15>> MData;
+	  sc_in<sc_uint<2> > MCmd;
+	  sc_in<sc_uint<8> > MAddr;
+	  sc_in<sc_uint<15> > MData;
 	  sc_in<bool> MDataValid;
 	  sc_in<bool> MRespAccept;
 	  sc_in<bool> SCmdAccept;
-	  sc_in<sc_uint<15>> SData;
+	  sc_in<sc_uint<15> > SData;
 	  sc_in<bool> SDataAccept;
 	  sc_in<bool> SResp;
 	  /* Control signals */
-	  sc_in<sc_uint<3>> Control;
+	  sc_in<sc_uint<3> > Control;
 	  sc_in<bool> MReset_n;
-    SC_CTOR (master) {
-     }
+
      void say_hello() {
      cout << "Welcome to Frank's world\n";
     }

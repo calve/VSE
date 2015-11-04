@@ -5,13 +5,9 @@
  *      Author: rkouere
  */
 
-#ifndef MASTER_H_
-#define MASTER_H_
+#ifndef OCP_H_
+#define OCP_H_
 
-class master {
-public:
-	master();
-	virtual ~master();
-};
 
-#endif /* MASTER_H_ */
+
+#endif /* OCP_H_ */
