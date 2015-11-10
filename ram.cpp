@@ -9,14 +9,16 @@
 
 void ram::read_data() {
 	if (enable && !writte) {
-		data = ram_data[addr.read()];
+		data_out = ram_data[addr_in.read()];
 	} else {
-		data = "ZZZZZZZZZZZZZZZZ";
+		data_out = -1;
 	}
-}
-void ram::write_data() {
-	if (enable && writte) {
-		ram_data[addr.read()] = data;
-	}
+	cout << "data_out = " << data_in << endl;
 }
 
+void ram::write_data() {
+	if (enable && writte) {
+		ram_data[addr_in.read()] = data_in;
+		cout << "data_in = " << ram_data[addr_in.read()] << endl;
+	}
+}
