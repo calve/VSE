@@ -10,6 +10,7 @@
 #include "systemc.h"
 
 #define MEM_SIZE 512
+
 SC_MODULE(Memory) {
 public:
 	enum Function {
@@ -42,7 +43,6 @@ public:
 		delete[] m_data;
 	}
 private:
-	int Function;
 	int m_clkCnt;
 	int m_curAddr;
 	int m_curData;
