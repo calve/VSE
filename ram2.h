@@ -106,4 +106,56 @@ private:
 	}
 };
 
+SC_MODULE(CPU) {
+public:
+	sc_in<bool> Port_CLK;
+	sc_in<Memory::RETSignal> Port_MemDone;
+	sc_out<Memory::Function> Port_MemFunc;
+	sc_out<int> Port_MemAddr;
+	sc_inout<int> Port_MemData;
+
+	SC_CTOR(CPU) {
+		SC_METHOD(execCycle);
+		sensitive_pos(Port_CLK);
+		dont_initialize();
+		SC_METHOD(memDone);
+		sensitive(Port_MemDone);
+		dont_initialize();
+		m_waitMem = false;
+	}
+private:
+	bool m_waitMem;
+	Memory::Function getrndfunc() {
+		int rndnum = (rand() % 10);
+		if (rndnum < 5)
+			return Memory::FUNC_READ;
+		else
+			return Memory::FUNC_WRITE;
+	}
+	int getRndAddress() {
+		return (rand() % MEM_SIZE);
+	}
+	int getRndData() {
+		return rand();
+	}
+	void execCycle() {
+		if (m_waitMem) {
+			return;
+		}
+		int addr = getRndAddress();
+		Memory::Function f = getrndfunc();
+		Port_MemFunc.write(f);
+		Port_MemAddr.write(addr);
+		if (f == Memory::FUNC_WRITE)
+			Port_MemData.write(getRndData());
+		m_waitMem = true;
+	}
+	void memDone() {
+		if (Port_MemDone.read() == Memory::RSIG_NONE) {
+			return;
+		}
+		m_waitMem = false;
+		Port_MemFunc.write(Memory::FUNC_NONE);
+	}
+};
 #endif /* RAM2_H_ */
