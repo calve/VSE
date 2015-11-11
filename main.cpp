@@ -6,97 +6,41 @@
  */
 
 #include "systemc.h"
+//#include "ram.h"
+//#include "ram2.h"
+
 #include "ram.h"
-#include "ram2.h"
 
-int sc_main(int argc, char* argv[]) {
-	cout << "\n\nCreating Modules............";
-	/* Instantiate Modules */
-	Memory mem("main_memory");
-	CPU cpu("cpu");
-	/* Signals */
-	sc_signal<Memory::Function> sigMemFunc;
-	sc_signal<Memory::RETSignal> sigMemDone;
-	sc_signal<int> sigMemAddr;
-	sc_signal<int> sigMemData;
-
-	/* The clock that will drive the CPU and Memory*/
-	sc_clock clk;
-	cout << "DONE\nConnecting Modules' Ports...";
-	/* Connecting module ports with signals */
-	mem.Port_Func(sigMemFunc);
-	mem.Port_Addr(sigMemAddr);
-	mem.Port_Data(sigMemData);
-	mem.Port_DoneSig(sigMemDone);
-	cpu.Port_MemFunc(sigMemFunc);
-	cpu.Port_MemAddr(sigMemAddr);
-	cpu.Port_MemData(sigMemData);
-	cpu.Port_MemDone(sigMemDone);
-	mem.Port_CLK(clk);
-	cpu.Port_CLK(clk);
-	cout << "DONE\n" << endl << "\n\nRunning (press CTRL+C to exit)... ";
-	/* Start Simulation */
-	sc_start();
+int sc_main(int argc, char * argv[]) {
+	try {
+		//Instantiate Modules
+		Memory mem("main_memory");
+		CPU cpu("cpu");
+		//Signals
+		sc_buffer<Memory::Function> sigMemFunc;
+		sc_buffer<Memory::RetCode> sigMemDone;
+		sc_signal<int> sigMemAddr;
+		sc_signal_rv<32> sigMemData;
+		// The clock that will drive the CPU and Memory
+		sc_clock clk;
+		// Connecting module ports with signals
+		mem.Port_Func(sigMemFunc);
+		mem.Port_Addr(sigMemAddr);
+		mem.Port_Data(sigMemData);
+		mem.Port_Done(sigMemDone);
+		cpu.Port_MemFunc(sigMemFunc);
+		cpu.Port_MemAddr(sigMemAddr);
+		cpu.Port_MemData(sigMemData);
+		cpu.Port_MemDone(sigMemDone);
+		mem.Port_CLK(clk);
+		cpu.Port_CLK(clk);
+		cout << " Running (press CTRL + C to exit)... " << endl;
+		// Start Simulation
+		sc_start();
+	} catch (const std::exception & e) {
+		cerr << e.what() << endl;
+	}
 	return 0;
 }
 
-//int sc_main(int argc, char * argv[]) {
-//	sc_signal<bool> clock;
-//	sc_signal<sc_int<8> > addr;
-//	sc_signal<bool> enable;
-//	sc_signal<bool> writte;
-//	sc_signal<sc_int<16> > data_in;
-//	sc_signal<sc_int<16> > data_out;
-//
-//	sc_trace_file *my_trace_file;
-//	my_trace_file =
-//			sc_create_vcd_trace_file("ram_trace");
-//	sc_trace(my_trace_file, data_in, "data_in");
-//	sc_trace(my_trace_file, data_out, "data_out");
-//	sc_trace(my_trace_file, addr, "addr");
-//	ram ram("ram");
-//	ram.addr_in(addr);
-//	ram.enable(enable);
-//	ram.writte(writte);
-//	ram.data_in(data_in);
-//	ram.data_out(data_out);
-//
-//	cout << "init ram" << endl;
-//	/* test writting 2 to the ram @1 */
-//	addr = 1;
-//	writte = true;
-//	data_in = 20;
-//	enable = true;
-//	sc_start();
-//
-//	cout << "test 1" << endl;
-//	addr = 2;
-//	writte = true;
-//	data_in = 5;
-//	enable = true;
-//	sc_start();
-//
-//
-//	/* test writting 1 to the ram @1 */
-//	cout << "test 2" << endl;
-//	addr = 1;
-//	writte = false;
-//	sc_start();
-//
-//	cout << "test 3" << endl;
-//	/* test reading the ram @10 */
-//	addr = 10;
-//	enable = true;
-//	writte = false;
-//	sc_start();
-//
-//	cout << "test 4" << endl;
-//	/* test reading the ram @10 */
-//	addr = 2;
-//	enable = true;
-//	writte = false;
-//	sc_start();
-//
-//	return EXIT_SUCCESS;
-//}
 

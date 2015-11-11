@@ -13,7 +13,7 @@
 
 SC_MODULE(Memory) {
 public:
-	enum Function {
+	enum Function_enum {
 		FUNC_NONE, FUNC_READ, FUNC_WRITE
 	};
 	enum RETSignal {
@@ -21,7 +21,7 @@ public:
 	};
 
 	sc_in<bool> Port_CLK;
-	sc_in<Function> Port_Func;
+	sc_in<Function_enum> Port_Func;
 	sc_in<int> Port_Addr;
 	sc_inout<int> Port_Data;
 	sc_out<RETSignal> Port_DoneSig;
@@ -38,11 +38,13 @@ public:
 		m_readsCnt = 0;
 		m_errorsCnt = 0;
 		m_errorCode = 0;
+
 	}
 	~Memory() {
 		delete[] m_data;
 	}
 private:
+	int Function;
 	int m_clkCnt;
 	int m_curAddr;
 	int m_curData;
@@ -110,7 +112,7 @@ SC_MODULE(CPU) {
 public:
 	sc_in<bool> Port_CLK;
 	sc_in<Memory::RETSignal> Port_MemDone;
-	sc_out<Memory::Function> Port_MemFunc;
+	sc_out<Memory::Function_enum> Port_MemFunc;
 	sc_out<int> Port_MemAddr;
 	sc_inout<int> Port_MemData;
 
@@ -125,7 +127,7 @@ public:
 	}
 private:
 	bool m_waitMem;
-	Memory::Function getrndfunc() {
+	Memory::Function_enum getrndfunc() {
 		int rndnum = (rand() % 10);
 		if (rndnum < 5)
 			return Memory::FUNC_READ;
@@ -143,7 +145,7 @@ private:
 			return;
 		}
 		int addr = getRndAddress();
-		Memory::Function f = getrndfunc();
+		Memory::Function_enum f = getrndfunc();
 		Port_MemFunc.write(f);
 		Port_MemAddr.write(addr);
 		if (f == Memory::FUNC_WRITE)
