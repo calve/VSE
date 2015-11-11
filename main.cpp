@@ -8,12 +8,38 @@
 #include "systemc.h"
 #include "ram.h"
 #include "ram2.h"
-int sc_main(int argc, char* argv[])
-{
-Memory mem("main_memory");
-sc_start();
-return 0;
+
+int sc_main(int argc, char* argv[]) {
+	cout << "\n\nCreating Modules............";
+	/* Instantiate Modules */
+	Memory mem("main_memory");
+	CPU cpu("cpu");
+	/* Signals */
+	sc_signal<Memory::Function> sigMemFunc;
+	sc_signal<Memory::RETSignal> sigMemDone;
+	sc_signal<int> sigMemAddr;
+	sc_signal<int> sigMemData;
+
+	/* The clock that will drive the CPU and Memory*/
+	sc_clock clk;
+	cout << "DONE\nConnecting Modules' Ports...";
+	/* Connecting module ports with signals */
+	mem.Port_Func(sigMemFunc);
+	mem.Port_Addr(sigMemAddr);
+	mem.Port_Data(sigMemData);
+	mem.Port_DoneSig(sigMemDone);
+	cpu.Port_MemFunc(sigMemFunc);
+	cpu.Port_MemAddr(sigMemAddr);
+	cpu.Port_MemData(sigMemData);
+	cpu.Port_MemDone(sigMemDone);
+	mem.Port_CLK(clk);
+	cpu.Port_CLK(clk);
+	cout << "DONE\n" << endl << "\n\nRunning (press CTRL+C to exit)... ";
+	/* Start Simulation */
+	sc_start();
+	return 0;
 }
+
 //int sc_main(int argc, char * argv[]) {
 //	sc_signal<bool> clock;
 //	sc_signal<sc_int<8> > addr;

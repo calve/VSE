@@ -116,10 +116,10 @@ public:
 
 	SC_CTOR(CPU) {
 		SC_METHOD(execCycle);
-		sensitive_pos(Port_CLK);
+		sensitive << Port_CLK.pos();
 		dont_initialize();
 		SC_METHOD(memDone);
-		sensitive(Port_MemDone);
+		sensitive << Port_MemDone;
 		dont_initialize();
 		m_waitMem = false;
 	}
