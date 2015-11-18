@@ -34,7 +34,15 @@ int sc_main(int argc, char * argv[]) {
 		cpu.Port_MemDone(sigMemDone);
 		mem.Port_CLK(clk);
 		cpu.Port_CLK(clk);
-		cout << " Running (press CTRL + C to exit)... " << endl;
+
+		cout << "Installing trace signals. Output in ram_trace.vcd " << endl;
+		sc_trace_file *wf = sc_create_vcd_trace_file("ram_trace");
+		sc_trace(wf, clk, "clock");
+		sc_trace(wf, sigMemFunc, "function");
+		sc_trace(wf, sigMemAddr, "sigMemAddr");
+		sc_trace(wf, sigMemData, "sigMemData");
+
+ 		cout << " Running (press CTRL + C to exit)... " << endl;
 		// Start Simulation
 		sc_start();
 	} catch (const std::exception & e) {
