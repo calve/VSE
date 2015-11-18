@@ -10,6 +10,7 @@
 //#include "ram2.h"
 
 #include "ram.h"
+#include "cpu.h"
 
 int sc_main(int argc, char * argv[]) {
 	try {
