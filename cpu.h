@@ -23,19 +23,23 @@ SC_MODULE(CPU) {
   }
  private:
   void execute() {
+    int addr = 0;
     while (true) {
-      wait();
+      wait(Clk.value_changed_event());
       int f = (rand() % 10) < 5 ? WRITE : READ;
-      int addr = (rand() % MEM_SIZE);
+      addr += 1;
+      addr %= 10;
+      int data = -1;
       MAddr.write(addr);
-      MAddr.write(f);
       if (f == WRITE) {
-        int data = rand();
+        data = rand();
         cout << " Writing " << data << " at " << addr << endl;
         MData.write(data);
+        MAddr.write(f);
       }
       else {
-        int data = MData.read().to_int();
+        MAddr.write(f);
+        data = MData.read().to_int();
         cout << " Reading " << data << " at " << addr << endl;
       }
       wait();

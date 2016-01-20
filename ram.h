@@ -31,7 +31,7 @@ SC_MODULE(Memory) {
   int * m_data;
   void execute() {
     while (true) {
-      wait(MCmd.value_changed_event());
+      wait(Clk.value_changed_event());
       int cmd = MCmd.read().to_int();
       int addr = MAddr.read();
       int data = 0;
