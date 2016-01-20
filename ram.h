@@ -1,13 +1,7 @@
-/*
- * rampolska.h
- *
- *  Created on: Nov 11, 2015
- *      Author: rkouere
- */
-
 #ifndef RAM_H_
 #define RAM_H_
 #include "systemc.h"
+#include "common.h"
 
 static const int MEM_SIZE = 512;
 SC_MODULE(Memory) {
@@ -18,15 +12,15 @@ public:
         enum RetCode {
                 RET_READ_DONE, RET_WRITE_DONE,
         };
-        sc_in<bool> Port_CLK;
-        sc_in<Function> Port_Func;
+        sc_in<bool> Clk;
+        sc_inout_rv<3> MCmd;
         sc_in<int> Port_Addr;
         sc_out<RetCode> Port_Done;
         sc_inout_rv<32> Port_Data;
 
         SC_CTOR(Memory) {
                 SC_THREAD(execute);
-                sensitive << Port_CLK.pos();
+                sensitive << Clk.pos();
                 dont_initialize();
                 m_data = new int[MEM_SIZE];
         }
@@ -38,16 +32,16 @@ private:
         int * m_data;
         void execute() {
                 while (true) {
-                        wait(Port_Func.value_changed_event());
-                        Function f = Port_Func.read();
+                        wait(MCmd.value_changed_event());
+                        int cmd = MCmd.read().to_int();
                         int addr = Port_Addr.read();
                         int data = 0;
-                        if (f == FUNC_WRITE) {
+                        if (cmd == WRITE) {
                                 data = Port_Data.read().to_int();
                         }
                         // Simulate Memory read / write delay
                         wait(100);
-                        if (f == FUNC_READ) {
+                        if (cmd == READ) {
                                 Port_Data.write((addr < MEM_SIZE) ? m_data[addr] : 0);
                                 Port_Done.write(RET_READ_DONE);
                                 wait();
