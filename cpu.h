@@ -1,10 +1,3 @@
-/*
- * rampolska.h
- *
- *  Created on: Nov 11, 2015
- *      Author: rkouere
- */
-
 #ifndef CPU_H_
 #define CPU_H_
 #include "systemc.h"
@@ -14,7 +7,10 @@ SC_MODULE(CPU) {
   sc_in<bool> Clk;
   sc_out_rv<3> MCmd;
   sc_out<int> MAddr;
-  sc_inout_rv<32> MData;
+  sc_out<int> MData;
+  sc_in<int> SData;
+  sc_out<int> SResp;
+  sc_in<int> SCmdAccept;
 
   SC_CTOR(CPU) {
     SC_THREAD(execute);
@@ -26,23 +22,27 @@ SC_MODULE(CPU) {
     int addr = 0;
     while (true) {
       wait(Clk.value_changed_event());
-      int f = (rand() % 10) < 5 ? WRITE : READ;
+      int f = (rand() % 2 ? WR : RD);
       addr += 1;
       addr %= 10;
       int data = -1;
+      SResp.write(0);
       MAddr.write(addr);
-      if (f == WRITE) {
-        data = rand();
-        cout << " Writing " << data << " at " << addr << endl;
+      MCmd.write(f);
+      if (f == WR) {
+        data = rand() % 16;
         MData.write(data);
-        MAddr.write(f);
+        cout << "CPU: Writing request at " << addr << " : " << data << endl;
+        wait(SCmdAccept.value_changed_event());
       }
-      else {
-        MAddr.write(f);
-        data = MData.read().to_int();
-        cout << " Reading " << data << " at " << addr << endl;
+      else if (f == RD) {
+        cout << "CPU: Reading request at " << addr << endl;
+        wait(SCmdAccept.value_changed_event());
+        cout << "CPU: Accepted by RAM" << endl;
+        SResp.write(1);
+        data = SData.read();
+        cout << " : " << data << endl;
       }
-      wait();
     }
   }
 };

@@ -11,17 +11,26 @@ int sc_main(int argc, char * argv[]) {
     CPU cpu("cpu");
     //Signals
     sc_signal_rv<3> MCmd;
-    sc_signal<int> sigMemAddr;
-    sc_signal_rv<32> sigMemData;
+    sc_signal<int> MAddr;
+    sc_signal<int> MData;
+    sc_signal<int> SData;
+    sc_signal<int> SResp;
+    sc_signal<int> SCmdAccept;
     // The clock that will drive the CPU and Memory
     sc_clock clk;
     // Connecting module ports with signals
     mem.MCmd(MCmd);
-    mem.MAddr(sigMemAddr);
-    mem.MData(sigMemData);
+    mem.MAddr(MAddr);
+    mem.MData(MData);
+    mem.SData(SData);
+    mem.SResp(SResp);
+    mem.SCmdAccept(SCmdAccept);
     cpu.MCmd(MCmd);
-    cpu.MAddr(sigMemAddr);
-    cpu.MData(sigMemData);
+    cpu.MAddr(MAddr);
+    cpu.MData(MData);
+    cpu.SData(SData);
+    cpu.SResp(SResp);
+    cpu.SCmdAccept(SCmdAccept);
     mem.Clk(clk);
     cpu.Clk(clk);
 
@@ -29,8 +38,8 @@ int sc_main(int argc, char * argv[]) {
     sc_trace_file *wf = sc_create_vcd_trace_file("ram_trace");
     sc_trace(wf, clk, "clock");
     sc_trace(wf, MCmd, "function");
-    sc_trace(wf, sigMemAddr, "sigMemAddr");
-    sc_trace(wf, sigMemData, "sigMemData");
+    sc_trace(wf, MAddr, "MAddr");
+    sc_trace(wf, MData, "MData");
 
     cout << " Running (press CTRL + C to exit)... " << endl;
     // Start Simulation

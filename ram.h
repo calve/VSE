@@ -6,16 +6,13 @@
 static const int MEM_SIZE = 512;
 SC_MODULE(Memory) {
  public:
-  enum Function {
-    FUNC_READ, FUNC_WRITE
-  };
-  enum RetCode {
-    RET_READ_DONE, RET_WRITE_DONE,
-  };
   sc_in<bool> Clk;
   sc_inout_rv<3> MCmd;
   sc_in<int> MAddr;
-  sc_inout_rv<32> MData;
+  sc_in<int> MData;
+  sc_out<int> SData;
+  sc_in<int> SResp;
+  sc_out<int> SCmdAccept;
 
   SC_CTOR(Memory) {
     SC_THREAD(execute);
@@ -31,22 +28,29 @@ SC_MODULE(Memory) {
   int * m_data;
   void execute() {
     while (true) {
-      wait(Clk.value_changed_event());
-      int cmd = MCmd.read().to_int();
-      int addr = MAddr.read();
+      int cmd;
+      int addr;
       int data = 0;
-      if (cmd == WRITE) {
-        data = MData.read().to_int();
+      wait(Clk.value_changed_event());
+      addr = MAddr.read();
+      cmd = MCmd.read().to_int();
+      if (cmd == WR) {
+        data = MData.read();
+        cout << "RAM: Write at " << addr << " : " << data;
+        m_data[addr] = data;
+        cout << " ... " << m_data[addr] << endl;
+        SCmdAccept.write(1);
       }
-      // Simulate Memory read / write delay
-      wait(100);
-      if (cmd == READ) {
-        MData.write((addr < MEM_SIZE) ? m_data[addr] : 0);
-        wait();
-      } else {
-        if (addr < MEM_SIZE) {
-          m_data[addr] = data;
-        }
+      else if (cmd == RD) {
+        SCmdAccept.write(1);
+        data = m_data[addr];
+        cout << "RAM: Read at " << addr << " : " << data << endl;
+        SData.write(data);
+        SCmdAccept.write(0);
+        wait(SResp.value_changed_event());
+      }
+      else {
+        cout << "RAM: Did nothing " << endl;
       }
     }
   }
