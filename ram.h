@@ -11,8 +11,8 @@ SC_MODULE(Memory) {
   sc_in<int> MAddr;
   sc_in<int> MData;
   sc_out<int> SData;
-  sc_in<int> SResp;
-  sc_out<int> SCmdAccept;
+  sc_in<bool> SResp;
+  sc_out<bool> SCmdAccept;
 
   SC_CTOR(Memory) {
     SC_THREAD(execute);
@@ -37,21 +37,26 @@ SC_MODULE(Memory) {
       if (cmd == WR) {
         data = MData.read();
         cout << "RAM: Write at " << addr << " : " << data;
-        m_data[addr] = data;
-        cout << " ... " << m_data[addr] << endl;
         SCmdAccept.write(1);
+        m_data[addr] = data;
+        wait(300, SC_PS); /* Write takes 0.3 ns */
+        cout << " ... " << m_data[addr] << endl;
+        SCmdAccept.write(0);
       }
       else if (cmd == RD) {
         SCmdAccept.write(1);
         data = m_data[addr];
+        wait(200, SC_PS); /* Read takes 0.2 ns */
+        SCmdAccept.write(0);
         cout << "RAM: Read at " << addr << " : " << data << endl;
         SData.write(data);
-        SCmdAccept.write(0);
         wait(SResp.value_changed_event());
+        SData.write(0);
       }
       else {
         cout << "RAM: Did nothing " << endl;
       }
+      
     }
   }
 };
