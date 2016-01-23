@@ -20,44 +20,45 @@ SC_MODULE(CPU) {
  private:
 
   void write(int addr, int data){
-    SResp.write(0);
     MAddr.write(addr);
     MData.write(data);
     MCmd.write(WR);
-    cout << "CPU: Writing request at " << addr << " : " << data << endl;
-    wait(SCmdAccept.value_changed_event());
-    cout << "CPU: Write Done " << endl;
+    while(!SCmdAccept.posedge()){
+      wait(SCmdAccept.value_changed_event());
+    }
+    while(!SCmdAccept.negedge()){
+      wait(SCmdAccept.value_changed_event());
+    }
+    MCmd.write(IDLE);
   }
 
   int read(int addr){
     int data;
     MAddr.write(addr);
     MCmd.write(RD);
-    cout << "CPU: Reading request at " << addr << endl;
-    wait(SCmdAccept.value_changed_event());
-    cout << "CPU: Accepted by RAM" << endl;
+    while(!SCmdAccept.posedge()){
+      wait(SCmdAccept.value_changed_event());
+    }
+    while(!SCmdAccept.negedge()){
+      wait(SCmdAccept.value_changed_event());
+    }
+    MCmd.write(IDLE);
     SResp.write(1);
     data = SData.read();
-    cout << " : " << data << endl;
+    wait(200, SC_PS); /* Read takes 0.2 ns */
+    SResp.write(0);
     return data;
   }
 
   void execute() {
-    int addr = 0;
-    while (true) {
-      wait(Clk.value_changed_event());
-      int f = (rand() % 2 ? WR : RD);
-      addr += 1;
-      addr %= 10;
-      int data = -1;
-      if (f == WR) {
-        data = rand() % 16;
-        write(addr, data);
-      }
-      else if (f == RD) {
-        data = read(addr);
-      }
-    }
+    wait(Clk.value_changed_event());
+    write(42, 0xdeadbeef);
+    wait(Clk.value_changed_event());
+    write(30, 0xbadbad02);
+    wait(Clk.value_changed_event());
+    read(42);
+    wait(Clk.value_changed_event());
+    read(30);
   }
 };
 #endif /* CPU_H_ */

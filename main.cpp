@@ -3,7 +3,6 @@
 #include "ram.h"
 #include "cpu.h"
 
-
 int sc_main(int argc, char * argv[]) {
   try {
     //Instantiate Modules
@@ -52,5 +51,3 @@ int sc_main(int argc, char * argv[]) {
   }
   return 0;
 }
-
-

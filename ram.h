@@ -36,11 +36,9 @@ SC_MODULE(Memory) {
       cmd = MCmd.read().to_int();
       if (cmd == WR) {
         data = MData.read();
-        cout << "RAM: Write at " << addr << " : " << data;
         SCmdAccept.write(1);
         m_data[addr] = data;
         wait(300, SC_PS); /* Write takes 0.3 ns */
-        cout << " ... " << m_data[addr] << endl;
         SCmdAccept.write(0);
       }
       else if (cmd == RD) {
@@ -48,15 +46,15 @@ SC_MODULE(Memory) {
         data = m_data[addr];
         wait(200, SC_PS); /* Read takes 0.2 ns */
         SCmdAccept.write(0);
-        cout << "RAM: Read at " << addr << " : " << data << endl;
         SData.write(data);
-        wait(SResp.value_changed_event());
+        while(!SResp.posedge()){
+          wait(SResp.value_changed_event());
+        }
+        while(!SResp.negedge()){
+          wait(SResp.value_changed_event());
+        }
         SData.write(0);
       }
-      else {
-        cout << "RAM: Did nothing " << endl;
-      }
-      
     }
   }
 };
