@@ -1,9 +1,9 @@
-# VSE
+# Simple OCP Write and Read Transfer
 
-This projects illustrate a simple read-write transfer between a CPU and
-a RAM, implementing the Open Core Protocol.
+This projects illustrate a simple read-write transfer between a processor and
+a memory, implementing the Open Core Protocol (OCP).
 
-The following signals are used :
+The following OCP signals are used :
 
   - Clk
   - MCmd
@@ -24,6 +24,8 @@ and the OCP specification 3, section 10.1, figure 21.
 
 
 ## Compilation
+
+The projects depends on systemc.
 
 Compile
 
